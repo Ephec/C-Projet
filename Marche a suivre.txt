@@ -1,0 +1,14 @@
+Voici un petit fichier texte sur ce que je considère qu'il faut faire :
+-----------------------------------------------------------------------
+
+1. Le serveur (ATIS)
+
+Il doit créer le fifo d'entrée et si il existe déjà, il doit le supprimer et le recréer. Ensuite il doit boucler indéfiniment en attenant que le fifo contienne des éléments dedans et il doit répondre en créer un fifo sortie par demande. Une fois la "conversation" engagée, le serveur communique (entrée/sortie) avec le fifo particulier du client avec par exemple un système de delay. Le serveur passe à une autre demande lorqu'une demande est totalement terminée.
+
+2. Le client / Pilote 
+
+Il envoi des demandes via le fifo d'entrée (constante à tous les clients) dans lequel il communique juste son PID via un getpid(). Ensuite il boucle jusqu'a ce qu'il recoive une info dans le fifo de sortie. Si l'info est KO, il doit réenvoyer cette info, si c'est OK, c'est le serveur qui se charger de supprimer le FIFO.
+
+3. Le client météo
+
+Génère un fichier texte avec aléatoirement des informations météo que le serveur ATIS ira chercher à interval régulier (boucle infinie ou pas ???).
