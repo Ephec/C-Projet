@@ -9,15 +9,21 @@
 #include <ctype.h>
 #include <fcntl.h>
 
-const char fifoIN[]="fifoIN";
+#include "Structure.h"
 
 void creerFifoEntree();
-void traitement();
+void ouvrirFifoIn(int *ouverture);
+void traitement(int ouverture);
 
 int main(){
 
+    int ouvertureIn;
+
     creerFifoEntree();
-    traitement();
+
+        ouvrirFifoIn(&ouvertureIn);
+        traitement(ouvertureIn);
+        close(ouvertureIn);
 
 	return(0);
 }
@@ -59,37 +65,103 @@ void creerFifoEntree(){
 
 }
 
-void traitement(){
+void ouvrirFifoIn(int *ouverture){
 
-    int ouverture, lecture, pid;
-
-	// ouverture du tube
-	ouverture=open(fifoIN, O_RDONLY);
-	if(ouverture==-1)
+    *ouverture=open(fifoIN, O_RDONLY);
+	if(*ouverture==-1)
 	{
 		perror("\n Echec ouverture du FIFO");
 		exit(1);
 	}
 	else {
 
-        printf("\n FIFO ouvert en lecture");
+        printf("\n FIFO IN ouvert en lecture");
 
 	}
+}
 
-	printf("\n\n Etat des demands ATIS :");
-	printf("\n\n -----------------------");
+void traitement(int ouverture){
+
+    int pid,lecture;
+    int ouvertureOut, ecriture, efifo;
+    int i,compteur;
+    char fifoOut[12];
+    Treponse retour;
+
+    printf("\n\n Etat des demands ATIS :");
+	printf("\n -----------------------");
+	compteur=0;
+
+    for(i=0;i<2;i++){
 
 	lecture=read(ouverture,&pid,sizeof(int));
 
-  	if(lecture < 0){
-        printf("\n\n Erreur lors de la lecture dans le fifo");
-        printf("\n Erreur %d",lecture);
-        exit(-1);
-  	}
-  	else {
-  	    printf("\n\n Lecture PID (voir pilote) : %d",pid);
-  	}
+	if(pid!=retour.pid){
 
-	close(ouverture);
+	    compteur=0;
 
+        if(lecture < 0){
+            printf("\n\n Erreur lors de la lecture dans le fifo");
+            printf("\n Erreur %d",lecture);
+            exit(-1);
+        }
+        else {
+            printf("\n\n Lecture PID (voir pilote) : %d",pid);
+        }
+
+        // On genère le nom du fifo Out
+
+        char spid[4];
+        sprintf(spid,"%d",pid);
+
+        strcpy(fifoOut,"fifo");
+        strcat(fifoOut,spid);
+
+        // Ouverture du fifo de sortie du client
+
+        printf("\n\n Reponse au pilote :");
+        printf("\n -------------------");
+
+        sleep(3);
+
+        ouvertureOut=open(fifoOut, O_WRONLY);
+        if(ouvertureOut==-1)
+        {
+            perror("\n Echec ouverture du FIFO Out");
+            exit(1);
+        }
+        else {
+
+            printf("\n\n FIFO Out ouvert en écriture : %s",fifoOut);
+
+        }
+
+        retour.pid=pid;
+        strcpy(retour.reponse,"OK - Temps dégagé et vent de 20 km/h");
+
+        printf("\n PID : %d",retour.pid);
+        printf("\n Temps : %s",retour.reponse);
+        printf("\n\n -------------------------------------------");
+
+        ecriture = write(ouvertureOut, &retour, sizeof(Treponse));
+
+        close(ouvertureOut);
+
+	}
+	else{
+        printf("\n Attente d'une demande pendant 10 secondes...\n");
+        sleep(10);
+        compteur++;
+        if(compteur>5){
+
+            printf("\n\n Le serveur a attendu trop longtemps (60 secondes)!");
+            printf("\n Il va quitter...");
+            i=2;
+
+        }
+	}
+
+    i--;
+
+    } // fin du for
 }
