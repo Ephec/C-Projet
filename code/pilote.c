@@ -127,7 +127,7 @@ int main(){
             srand(time(NULL));
             temp = rand();
 
-            reception = temp % 2;
+            reception = temp % 4;
 
             if(reception==0){
 
