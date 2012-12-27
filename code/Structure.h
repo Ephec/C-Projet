@@ -1,4 +1,5 @@
 #define fifoIN "fifoIN"
+#define meteo "meteo.txt"
 
 // Une demande au serveur composé du PID et d'un type
 // Le type peut être ASK, OK ou KO
