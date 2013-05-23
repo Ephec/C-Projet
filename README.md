@@ -1,7 +1,7 @@
 #Projet de C - 1er Quadrimèstre 2012-2013
 -----
 
-Projet réalisé dans le cadre du cours de Système d'Exploitation Travaux Pratiques par **Antoine BETAS** et **Cédric BREMER**, 2TL1, Ephec Louvain-La-Neuve
+Projet réalisé dans le cadre du cours de Système d'Exploitation Travaux Pratiques par **Antoine BETAS** 
 
 ##Consignes et échéances
 
